@@ -1,0 +1,847 @@
+{
+  "generatedAt": "2026-11-22T19:39:22.894Z",
+  "total": 33,
+  "passed": 33,
+  "results": [
+    {
+      "no": 1,
+      "name": "Login dengan kredensial benar",
+      "expected": 200,
+      "actual": 200,
+      "pass": true,
+      "request": {
+        "method": "POST",
+        "url": "/api/auth/login",
+        "auth": "(tanpa header Authorization)",
+        "body": {
+          "username": "budi",
+          "password": "Budi#2026"
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "Login berhasil",
+        "data": {
+          "token": "eyJhbGciOiJIUzI1NiIs...(dipotong)",
+          "tokenType": "Bearer",
+          "expiresIn": "15m",
+          "user": {
+            "id": "M2024001",
+            "nama": "Budi Santoso",
+            "role": "mahasiswa"
+          }
+        }
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 2,
+      "name": "Login dengan password salah",
+      "expected": 401,
+      "actual": 401,
+      "pass": true,
+      "request": {
+        "method": "POST",
+        "url": "/api/auth/login",
+        "auth": "(tanpa header Authorization)",
+        "body": {
+          "username": "budi",
+          "password": "salah-total"
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Username atau password salah"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 3,
+      "name": "Akses endpoint terlindungi tanpa token",
+      "expected": 401,
+      "actual": 401,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan",
+        "auth": "(tanpa header Authorization)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Autentikasi diperlukan: sertakan header Authorization Bearer"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 4,
+      "name": "Akses menggunakan token tidak valid",
+      "expected": 401,
+      "actual": 401,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan",
+        "auth": "Bearer abc.def.ghi",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Token tidak valid"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 5,
+      "name": "Mahasiswa membuat pengaduan valid",
+      "expected": 201,
+      "actual": 201,
+      "pass": true,
+      "request": {
+        "method": "POST",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas."
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "Pengaduan berhasil dibuat",
+        "data": {
+          "id": 4,
+          "mahasiswaId": "M2024001",
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas.",
+          "status": "diajukan",
+          "createdAt": "2026-11-22T19:39:22.804Z"
+        }
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 6,
+      "name": "Mahasiswa membaca pengaduan sendiri",
+      "expected": 200,
+      "actual": 200,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan/1",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Detail pengaduan berhasil diambil",
+        "data": {
+          "id": 1,
+          "mahasiswaId": "M2024001",
+          "judul": "Proyektor ruang B204 rusak",
+          "kategori": "Fasilitas",
+          "deskripsi": "Proyektor di ruang B204 tidak menyala sejak awal minggu ini sehingga perkuliahan terganggu.",
+          "status": "diajukan",
+          "createdAt": "2026-11-02T01:15:00.000Z"
+        }
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 7,
+      "name": "Mahasiswa mencoba membaca pengaduan orang lain",
+      "expected": 403,
+      "actual": 403,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan/2",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Anda tidak berhak mengakses pengaduan ini"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 8,
+      "name": "Mahasiswa mengubah status pengaduan",
+      "expected": 403,
+      "actual": 403,
+      "pass": true,
+      "request": {
+        "method": "PATCH",
+        "url": "/api/pengaduan/1/status",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "status": "selesai"
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Role Anda tidak diizinkan melakukan operasi ini"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 9,
+      "name": "Admin melihat seluruh pengaduan",
+      "expected": 200,
+      "actual": 200,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Daftar pengaduan berhasil diambil",
+        "data": [
+          {
+            "id": 1,
+            "mahasiswaId": "M2024001",
+            "judul": "Proyektor ruang B204 rusak",
+            "kategori": "Fasilitas",
+            "deskripsi": "Proyektor di ruang B204 tidak menyala sejak awal minggu ini sehingga perkuliahan terganggu.",
+            "status": "diajukan",
+            "createdAt": "2026-11-02T01:15:00.000Z"
+          },
+          {
+            "id": 2,
+            "mahasiswaId": "M2024002",
+            "judul": "KRS tidak dapat diakses",
+            "kategori": "Akademik",
+            "deskripsi": "Halaman KRS menampilkan error saat dibuka sehingga saya tidak bisa mengisi mata kuliah.",
+            "status": "diajukan",
+            "createdAt": "2026-11-03T03:30:00.000Z"
+          },
+          {
+            "id": 3,
+            "mahasiswaId": "M2024001",
+            "judul": "WiFi kampus sangat lambat",
+            "kategori": "TI",
+            "deskripsi": "Koneksi WiFi di gedung perpustakaan sangat lambat pada jam sibuk sehingga sulit mengunduh materi.",
+            "status": "diproses",
+            "createdAt": "2026-11-04T07:45:00.000Z"
+          },
+          {
+            "id": 4,
+            "mahasiswaId": "M2024001",
+            "judul": "AC ruang kelas C101 mati",
+            "kategori": "Fasilitas",
+            "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas.",
+            "status": "diajukan",
+            "createdAt": "2026-11-22T19:39:22.804Z"
+          }
+        ]
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 10,
+      "name": "Admin memperbarui status pengaduan",
+      "expected": 200,
+      "actual": 200,
+      "pass": true,
+      "request": {
+        "method": "PATCH",
+        "url": "/api/pengaduan/4/status",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "status": "diproses"
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "Status pengaduan berhasil diperbarui",
+        "data": {
+          "id": 4,
+          "mahasiswaId": "M2024001",
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas.",
+          "status": "diproses",
+          "createdAt": "2026-11-22T19:39:22.804Z"
+        }
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 11,
+      "name": "Membuat pengaduan dengan field wajib kosong",
+      "expected": 400,
+      "actual": 400,
+      "pass": true,
+      "request": {
+        "method": "POST",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "judul": "",
+          "kategori": "Fasilitas",
+          "deskripsi": ""
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Validasi gagal",
+        "errors": [
+          {
+            "field": "judul",
+            "message": "Field tidak boleh kosong"
+          },
+          {
+            "field": "deskripsi",
+            "message": "Field tidak boleh kosong"
+          }
+        ]
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 12,
+      "name": "Mengakses ID pengaduan yang tidak ditemukan",
+      "expected": 404,
+      "actual": 404,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan/9999",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Pengaduan tidak ditemukan"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 13,
+      "name": "Token kedaluwarsa ditolak",
+      "expected": 401,
+      "actual": 401,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong) (exp sudah lewat)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Token telah kedaluwarsa, silakan login kembali"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 14,
+      "name": "Token dengan tanda tangan palsu ditolak",
+      "expected": 401,
+      "actual": 401,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong) (ditandatangani kunci lain)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Token tidak valid"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 15,
+      "name": "Mahasiswa hanya melihat daftar pengaduannya sendiri",
+      "expected": 200,
+      "actual": 200,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Daftar pengaduan berhasil diambil",
+        "data": [
+          {
+            "id": 1,
+            "mahasiswaId": "M2024001",
+            "judul": "Proyektor ruang B204 rusak",
+            "kategori": "Fasilitas",
+            "deskripsi": "Proyektor di ruang B204 tidak menyala sejak awal minggu ini sehingga perkuliahan terganggu.",
+            "status": "diajukan",
+            "createdAt": "2026-11-02T01:15:00.000Z"
+          },
+          {
+            "id": 3,
+            "mahasiswaId": "M2024001",
+            "judul": "WiFi kampus sangat lambat",
+            "kategori": "TI",
+            "deskripsi": "Koneksi WiFi di gedung perpustakaan sangat lambat pada jam sibuk sehingga sulit mengunduh materi.",
+            "status": "diproses",
+            "createdAt": "2026-11-04T07:45:00.000Z"
+          },
+          {
+            "id": 4,
+            "mahasiswaId": "M2024001",
+            "judul": "AC ruang kelas C101 mati",
+            "kategori": "Fasilitas",
+            "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas.",
+            "status": "diproses",
+            "createdAt": "2026-11-22T19:39:22.804Z"
+          }
+        ]
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 16,
+      "name": "Mass assignment (id, mahasiswaId, status dari client) ditolak",
+      "expected": 400,
+      "actual": 400,
+      "pass": true,
+      "request": {
+        "method": "POST",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas.",
+          "id": 1,
+          "mahasiswaId": "M2024002",
+          "status": "selesai"
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Validasi gagal",
+        "errors": [
+          {
+            "field": "id",
+            "message": "Field tidak diperbolehkan"
+          },
+          {
+            "field": "mahasiswaId",
+            "message": "Field tidak diperbolehkan"
+          },
+          {
+            "field": "status",
+            "message": "Field tidak diperbolehkan"
+          }
+        ]
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 17,
+      "name": "Admin tidak boleh membuat pengaduan",
+      "expected": 403,
+      "actual": 403,
+      "pass": true,
+      "request": {
+        "method": "POST",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas."
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Role Anda tidak diizinkan melakukan operasi ini"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 18,
+      "name": "Admin tidak boleh mengubah isi pengaduan (PUT)",
+      "expected": 403,
+      "actual": 403,
+      "pass": true,
+      "request": {
+        "method": "PUT",
+        "url": "/api/pengaduan/1",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas."
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Role Anda tidak diizinkan melakukan operasi ini"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 19,
+      "name": "Mahasiswa mengubah pengaduan milik orang lain",
+      "expected": 403,
+      "actual": 403,
+      "pass": true,
+      "request": {
+        "method": "PUT",
+        "url": "/api/pengaduan/2",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas."
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Anda tidak berhak mengakses pengaduan ini"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 20,
+      "name": "Mahasiswa mengubah pengaduan sendiri (status diajukan)",
+      "expected": 200,
+      "actual": 200,
+      "pass": true,
+      "request": {
+        "method": "PUT",
+        "url": "/api/pengaduan/1",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas."
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "Pengaduan berhasil diperbarui",
+        "data": {
+          "id": 1,
+          "mahasiswaId": "M2024001",
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas.",
+          "status": "diajukan",
+          "createdAt": "2026-11-02T01:15:00.000Z"
+        }
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 21,
+      "name": "Mahasiswa mengubah pengaduan yang sudah diproses",
+      "expected": 409,
+      "actual": 409,
+      "pass": true,
+      "request": {
+        "method": "PUT",
+        "url": "/api/pengaduan/4",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "judul": "AC ruang kelas C101 mati",
+          "kategori": "Fasilitas",
+          "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas."
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Pengaduan hanya dapat diubah atau dihapus selama berstatus diajukan"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 22,
+      "name": "Mahasiswa menghapus pengaduan milik orang lain",
+      "expected": 403,
+      "actual": 403,
+      "pass": true,
+      "request": {
+        "method": "DELETE",
+        "url": "/api/pengaduan/2",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Anda tidak berhak mengakses pengaduan ini"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 23,
+      "name": "Mahasiswa menghapus pengaduan yang sudah diproses",
+      "expected": 409,
+      "actual": 409,
+      "pass": true,
+      "request": {
+        "method": "DELETE",
+        "url": "/api/pengaduan/3",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Pengaduan hanya dapat diubah atau dihapus selama berstatus diajukan"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 24,
+      "name": "Admin tidak boleh menghapus pengaduan",
+      "expected": 403,
+      "actual": 403,
+      "pass": true,
+      "request": {
+        "method": "DELETE",
+        "url": "/api/pengaduan/2",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Role Anda tidak diizinkan melakukan operasi ini"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 25,
+      "name": "Mahasiswa menghapus pengaduan sendiri (status diajukan)",
+      "expected": 200,
+      "actual": 200,
+      "pass": true,
+      "request": {
+        "method": "DELETE",
+        "url": "/api/pengaduan/5",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Pengaduan berhasil dihapus"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 26,
+      "name": "Pengaduan yang sudah dihapus tidak dapat diakses lagi",
+      "expected": 404,
+      "actual": 404,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan/5",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Pengaduan tidak ditemukan"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 27,
+      "name": "Admin memberi status tidak valid",
+      "expected": 400,
+      "actual": 400,
+      "pass": true,
+      "request": {
+        "method": "PATCH",
+        "url": "/api/pengaduan/2/status",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "status": "dibatalkan"
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Validasi gagal",
+        "errors": [
+          {
+            "field": "status",
+            "message": "Harus salah satu dari: diajukan, diproses, selesai"
+          }
+        ]
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 28,
+      "name": "Admin mengirim field tambahan pada PATCH status",
+      "expected": 400,
+      "actual": 400,
+      "pass": true,
+      "request": {
+        "method": "PATCH",
+        "url": "/api/pengaduan/2/status",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": {
+          "status": "diproses",
+          "mahasiswaId": "A001"
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Validasi gagal",
+        "errors": [
+          {
+            "field": "mahasiswaId",
+            "message": "Field tidak diperbolehkan"
+          }
+        ]
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 29,
+      "name": "Body JSON rusak (format salah)",
+      "expected": 400,
+      "actual": 400,
+      "pass": true,
+      "request": {
+        "method": "POST",
+        "url": "/api/pengaduan",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": "{\"judul\": \"tanpa penutup\""
+      },
+      "response": {
+        "success": false,
+        "message": "Format JSON pada body tidak valid"
+      },
+      "dataUnchanged": true,
+      "note": null
+    },
+    {
+      "no": 30,
+      "name": "Parameter ID bukan angka",
+      "expected": 400,
+      "actual": 400,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/pengaduan/abc",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Validasi gagal",
+        "errors": [
+          {
+            "field": "id",
+            "message": "ID harus berupa bilangan bulat positif"
+          }
+        ]
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 31,
+      "name": "Login tanpa field password",
+      "expected": 400,
+      "actual": 400,
+      "pass": true,
+      "request": {
+        "method": "POST",
+        "url": "/api/auth/login",
+        "auth": "(tanpa header Authorization)",
+        "body": {
+          "username": "budi"
+        }
+      },
+      "response": {
+        "success": false,
+        "message": "Validasi gagal",
+        "errors": [
+          {
+            "field": "password",
+            "message": "Field wajib diisi"
+          }
+        ]
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 32,
+      "name": "Endpoint tidak dikenal",
+      "expected": 404,
+      "actual": 404,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/api/tidak-ada",
+        "auth": "Bearer eyJhbGciOiJIUzI1NiIs...(dipotong)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Endpoint tidak ditemukan"
+      },
+      "dataUnchanged": null,
+      "note": null
+    },
+    {
+      "no": 33,
+      "name": "Error tak terduga menghasilkan 500 tanpa membocorkan detail",
+      "expected": 500,
+      "actual": 500,
+      "pass": true,
+      "request": {
+        "method": "GET",
+        "url": "/__test/boom",
+        "auth": "(tanpa header Authorization)",
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "message": "Terjadi kesalahan pada server"
+      },
+      "dataUnchanged": null,
+      "note": null
+    }
+  ]
+}

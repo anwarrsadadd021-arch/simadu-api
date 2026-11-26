@@ -1,0 +1,75 @@
+### HTTP Client (VS Code REST Client / IntelliJ). Jalankan server dulu: npm start
+@host = http://localhost:3000
+
+### 1. Login mahasiswa (Budi)
+# @name loginBudi
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "budi", "password": "Budi#2026" }
+
+###
+@tokenBudi = {{loginBudi.response.body.data.token}}
+
+### 2. Login admin
+# @name loginAdmin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "admin", "password": "Admin#2026" }
+
+###
+@tokenAdmin = {{loginAdmin.response.body.data.token}}
+
+### 3. Login password salah -> 401
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "budi", "password": "salah" }
+
+### 4. Tanpa token -> 401
+GET {{host}}/api/pengaduan
+
+### 5. Mahasiswa membuat pengaduan -> 201
+POST {{host}}/api/pengaduan
+Authorization: Bearer {{tokenBudi}}
+Content-Type: application/json
+
+{ "judul": "AC ruang kelas C101 mati", "kategori": "Fasilitas", "deskripsi": "AC di ruang C101 tidak dingin sehingga ruangan terasa sangat panas." }
+
+### 6. Mahasiswa melihat pengaduan sendiri -> 200
+GET {{host}}/api/pengaduan/1
+Authorization: Bearer {{tokenBudi}}
+
+### 7. Mahasiswa melihat pengaduan orang lain -> 403
+GET {{host}}/api/pengaduan/2
+Authorization: Bearer {{tokenBudi}}
+
+### 8. Mahasiswa mengubah status -> 403
+PATCH {{host}}/api/pengaduan/1/status
+Authorization: Bearer {{tokenBudi}}
+Content-Type: application/json
+
+{ "status": "selesai" }
+
+### 9. Admin melihat semua -> 200
+GET {{host}}/api/pengaduan
+Authorization: Bearer {{tokenAdmin}}
+
+### 10. Admin memperbarui status -> 200
+PATCH {{host}}/api/pengaduan/1/status
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "status": "diproses" }
+
+### 11. Field wajib kosong -> 400
+POST {{host}}/api/pengaduan
+Authorization: Bearer {{tokenBudi}}
+Content-Type: application/json
+
+{ "judul": "", "kategori": "Fasilitas", "deskripsi": "" }
+
+### 12. ID tidak ditemukan -> 404
+GET {{host}}/api/pengaduan/9999
+Authorization: Bearer {{tokenBudi}}

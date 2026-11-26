@@ -1,0 +1,27 @@
+{
+  "name": "simadu-api",
+  "version": "1.0.0",
+  "description": "SIMADU API - Sistem Layanan Informasi dan Pengaduan Mahasiswa (UTS Web Service Engineering)",
+  "main": "server.cjs",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node tests/run-scenarios.cjs",
+    "start": "node server.cjs",
+    "dev": "node --watch server.cjs"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=20.12.0"
+  }
+}
